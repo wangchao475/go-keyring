@@ -1,6 +1,10 @@
 package keyring
 
-import "github.com/danieljoos/wincred"
+import (
+	"syscall"
+
+	"github.com/danieljoos/wincred"
+)
 
 const errNotFound = "Element not found."
 
