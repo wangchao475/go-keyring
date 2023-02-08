@@ -10,6 +10,13 @@ type windowsKeychain struct{}
 func (k windowsKeychain) Get(service, username string) (string, error) {
 	cred, err := wincred.GetGenericCredential(k.credName(service, username))
 	if err != nil {
+		if errno, ok := err.(syscall.Errno); ok {
+			// error signaled
+			i := int(errno)
+			if i == 1168 {
+				return "", ErrNotFound
+			}
+		}
 		if err.Error() == errNotFound {
 			return "", ErrNotFound
 		}
@@ -32,6 +39,13 @@ func (k windowsKeychain) Set(service, username, password string) error {
 func (k windowsKeychain) Delete(service, username string) error {
 	cred, err := wincred.GetGenericCredential(k.credName(service, username))
 	if err != nil {
+		if errno, ok := err.(syscall.Errno); ok {
+			// error signaled
+			i := int(errno)
+			if i == 1168 {
+				return ErrNotFound
+			}
+		}
 		if err.Error() == errNotFound {
 			return ErrNotFound
 		}
